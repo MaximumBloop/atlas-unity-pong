@@ -49,8 +49,7 @@ namespace ZPong
 
             //Apply temporary variable back to original component
             //rectTransform.anchoredPosition = newPosition;
-            Vector3 targetPosition = new Vector3(rectTransform.localPosition.x, newPosition.y, rectTransform.localPosition.z);
-            LeanTween.moveLocal(this.gameObject, targetPosition, 0.1f);
+            LeanTween.move(rectTransform, newPosition, 0.1f);
         }
 
         public float GetHalfHeight()
