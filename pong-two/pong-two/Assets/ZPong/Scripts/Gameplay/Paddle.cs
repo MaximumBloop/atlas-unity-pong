@@ -13,6 +13,8 @@ namespace ZPong
         private float halfPlayerHeight;
         public float screenTop { get; private set; }
         public float screenBottom { get; private set; }
+
+        private float speed = 10.0f;
         
         private RectTransform rectTransform;
 
@@ -42,11 +44,13 @@ namespace ZPong
             Vector2 newPosition = rectTransform.anchoredPosition;
 
             //Manipulate the temporary variable
-            newPosition.y += movement;
+            newPosition.y += movement * speed;
             newPosition.y = Mathf.Clamp(newPosition.y, screenBottom + halfPlayerHeight, screenTop - halfPlayerHeight);
 
             //Apply temporary variable back to original component
-            rectTransform.anchoredPosition = newPosition;
+            //rectTransform.anchoredPosition = newPosition;
+            Vector3 targetPosition = new Vector3(rectTransform.localPosition.x, newPosition.y, rectTransform.localPosition.z);
+            LeanTween.moveLocal(this.gameObject, targetPosition, 0.1f);
         }
 
         public float GetHalfHeight()

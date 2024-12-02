@@ -10,7 +10,7 @@ namespace ZPong
     {
         public float speed = 5f;
 
-        private float screenTop = 527;
+        internal float screenTop = 527;
         private float screenBottom = -527;
 
         private Vector2 direction;
@@ -72,7 +72,7 @@ namespace ZPong
             bounceSFX = this.GetComponent<AudioSource>();
         }
 
-        private void Update()
+        private async void Update()
         {
             if (ballActive)
             {
@@ -86,12 +86,13 @@ namespace ZPong
                 if (rectTransform.anchoredPosition.y >= screenTop || rectTransform.anchoredPosition.y <= screenBottom)
                 {
                     direction.y *= -1f;
+                    ReflectY(direction);
                     PlayBounceSound();
                 }
             }
         }
 
-        protected void OnTriggerEnter2D(Collider2D collision)
+        protected async void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.gameObject.CompareTag("Paddle"))
             {
@@ -101,7 +102,7 @@ namespace ZPong
                     paddle.GetComponent<RectTransform>().sizeDelta.y / 2f);
                 Vector2 newDirection = new Vector2(paddle.isLeftPaddle ? 1f : -1f, y);
 
-                Reflect(newDirection);
+                ReflectX(newDirection);
                 PlayBounceSound();
             }
             else if (collision.gameObject.CompareTag("Goal"))
@@ -120,20 +121,41 @@ namespace ZPong
             }
         }
 
-        public async void Reflect(Vector2 newDirection)
+        public async void ReflectX(Vector2 newDirection)
+        {
+            direction = newDirection.normalized;
+            AnimateBallX();
+        }
+
+        public async void ReflectY(Vector2 newDirection)
         {
             direction = newDirection.normalized;
             AnimateBallY();
         }
 
-        private async void AnimateBallY()
+        private async void AnimateBallX()
         {
             ballActive = false;
-            LeanTween.scaleY(this, 0.5f, 1f)
+            LeanTween.scaleX(this.gameObject, 0.5f, 0.2f)
                 .setEaseOutQuad()
                 .setOnComplete(() =>
                 {
-                    LeanTween.scaleY(this, 1.5f, 1f)
+                    LeanTween.scaleX(this.gameObject, 1.0f, 0.2f)
+                        .setEaseInQuad()
+                        .setOnComplete(() =>
+                        {
+                            ballActive = true;
+                        });
+                });
+        }
+        private async void AnimateBallY()
+        {
+            ballActive = false;
+            LeanTween.scaleY(this.gameObject, 0.5f, 0.2f)
+                .setEaseOutQuad()
+                .setOnComplete(() =>
+                {
+                    LeanTween.scaleY(this.gameObject, 1.0f, 0.2f)
                         .setEaseInQuad()
                         .setOnComplete(() =>
                         {

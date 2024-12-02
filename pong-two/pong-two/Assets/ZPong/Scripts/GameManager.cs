@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace ZPong
@@ -30,16 +31,31 @@ namespace ZPong
             goals = new Goal[2];
         }
 
-        void SetGame()
+        async void SetGame()
         {
             if (activeBall == null)
             {
                 activeBall = Instantiate(ballPrefab, Vector3.zero, this.transform.rotation, canvasParent.transform)
                     .GetComponent<Ball>();
+                
+                activeBall.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, activeBall.screenTop, 0);
+                await AnimateBallFalling();
+
                 activeBall.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             }
 
             activeBall.SetBallActive(false);
+        }
+
+        private Task AnimateBallFalling()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            
+            LeanTween.moveLocal(activeBall.gameObject, Vector3.zero, 1.3f)
+                .setEaseOutBounce()
+                .setOnComplete(() => tcs.SetResult(true));
+            
+            return tcs.Task;
         }
 
         void StartGame()

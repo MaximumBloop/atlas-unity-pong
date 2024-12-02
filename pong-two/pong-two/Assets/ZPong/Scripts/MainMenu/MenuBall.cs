@@ -19,7 +19,7 @@ namespace ZPong
                     paddle.GetComponent<RectTransform>().sizeDelta.y / 2f);
                 Vector2 newDirection = new Vector2(paddle.isLeftPaddle ? 1f : -1f, y);
 
-                Reflect(newDirection);
+                ReflectX(newDirection);
             }
             else if (collision.gameObject.CompareTag("Goal"))
             {
